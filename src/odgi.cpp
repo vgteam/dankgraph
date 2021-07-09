@@ -147,13 +147,13 @@ size_t graph_t::get_node_count() const {
 /// Return the smallest ID in the graph, or some smaller number if the
 /// smallest ID is unavailable. Return value is unspecified if the graph is empty.
 nid_t graph_t::min_node_id() const {
-    return _min_node_id;
+    return _min_node_id + _id_increment;
 }
 
 /// Return the largest ID in the graph, or some larger number if the
 /// largest ID is unavailable. Return value is unspecified if the graph is empty.
 nid_t graph_t::max_node_id() const {
-    return _max_node_id;
+    return _max_node_id + _id_increment;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -618,14 +618,14 @@ void graph_t::create_edge(const handle_t& left_h, const handle_t& right_h) {
     // insert the edge for each side
     if (create_edge) {
         ++_edge_count;
-        left_node.add_edge(get_id(right_h),
+        left_node.add_edge(get_id(right_h)-_id_increment,
                            get_is_reverse(right_h),
                            false,
                            get_is_reverse(left_h));
         left_node.clear_lock();
         // only insert the second side if it's on a different node
         if (left_rank != right_rank) {
-            right_node.add_edge(get_id(left_h),
+            right_node.add_edge(get_id(left_h)-_id_increment,
                                 get_is_reverse(left_h),
                                 true,
                                 get_is_reverse(right_h));
@@ -813,7 +813,6 @@ void graph_t::apply_ordering(const std::vector<handle_t>& order_in, bool compact
         [&](uint64_t id) {
             return ids[id - 1].second;
         };
-
     // nodes, edges, and path steps
 #pragma omp parallel for schedule(static, 1) num_threads(_num_threads)
     for (uint64_t i = 0; i < node_v.size(); ++i) {
@@ -823,7 +822,6 @@ void graph_t::apply_ordering(const std::vector<handle_t>& order_in, bool compact
             node.apply_ordering(get_new_id, to_flip);
         }
     }
-
     // path metadata
 #pragma omp parallel for schedule(static, 1) num_threads(_num_threads)
     for (uint64_t i = 1; i <= _path_handle_next; ++i) {

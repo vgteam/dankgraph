@@ -68,7 +68,7 @@ void gfa_to_handle(const string& gfa_filename,
         gg.for_each_sequence_line_in_file(
             filename,
             [&](gfak::sequence_elem s) {
-                uint64_t id = stol(s.name);
+                const uint64_t id = stol(s.name);
                 graph->create_handle(s.sequence, id - id_increment);
                 if (progress) progress_meter->increment(1);
             });
@@ -87,8 +87,8 @@ void gfa_to_handle(const string& gfa_filename,
             filename,
             [&](gfak::edge_elem e) {
                 if (e.source_name.empty()) return;
-                handlegraph::handle_t a = graph->get_handle(stol(e.source_name), !e.source_orientation_forward);
-                handlegraph::handle_t b = graph->get_handle(stol(e.sink_name), !e.sink_orientation_forward);
+                const handlegraph::handle_t a = graph->get_handle(stol(e.source_name), !e.source_orientation_forward);
+                const handlegraph::handle_t b = graph->get_handle(stol(e.sink_name), !e.sink_orientation_forward);
                 graph->create_edge(a, b);
                 if (progress) progress_meter->increment(1);
             });

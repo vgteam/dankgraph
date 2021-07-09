@@ -22,6 +22,8 @@ jobs:
       - name: Init and update submodules
         run: git submodule update --init --recursive
       - name: Build odgi
-        run: sed -i 's/CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -O3 -mcx16 -g/CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O -mcx16 -g -fsanitize=address/g' CMakeLists.txt && sed -i 's/CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -O3 -mcx16 -g/CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O -mcx16 -g -fsanitize=address/g' CMakeLists.txt && cmake -H. -Bbuild && cmake --build build -- -j 2
+        run: sed -i 's/CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -O3 -g/CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O -g -fsanitize=address/g' CMakeLists.txt && sed -i 's/CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -O3 -g/CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O -g -fsanitize=address/g' CMakeLists.txt && cmake -H. -Bbuild && cmake --build build -- -j 2
+      - name: Run odgi optimize bug
+        run: ASAN_OPTIONS=detect_leaks=1:symbolize=1 LSAN_OPTIONS=verbosity=0:log_threads=1 bin/odgi build -g test/bug.gfa -o test/bug.gfa.og && ASAN_OPTIONS=detect_leaks=1:symbolize=1 LSAN_OPTIONS=verbosity=0:log_threads=1 bin/odgi sort -i test/bug.gfa.og -P -O -o  test/bug.gfa.og.optimized.og
       - name: Run odgi tests
         run: ASAN_OPTIONS=detect_leaks=1:symbolize=1 LSAN_OPTIONS=verbosity=0:log_threads=1 bin/odgi test

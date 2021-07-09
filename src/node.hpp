@@ -33,9 +33,9 @@ class node_t {
     // relativistic conversions
     inline uint64_t to_delta(const uint64_t& other_id) const {
         if (other_id > id) {
-            return ((other_id - id) << 1) | 1;
+            return ((other_id - id) << 1) | 1UL;
         } else if (other_id < id) {
-            return ((id - other_id) << 1) | 0;
+            return ((id - other_id) << 1);// & ~(1UL << 1);
         } else {
             return 0;
         }
